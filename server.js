@@ -79,8 +79,8 @@ const sessionMiddleware = session({
   rolling: true,
   cookie: {
     httpOnly: true,
-    sameSite: "lax",
-    secure: NODE_ENV === "production",
+    secure: true,        // 🔥 force HTTPS cookies
+    sameSite: "none",    // 🔥 critical for Cloudflare + Nginx
     maxAge: SESSION_TTL_MS,
   },
   store: hasDatabase
