@@ -43,9 +43,9 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const INBOUND_API_KEY = process.env.INBOUND_API_KEY || "change-me";
 const OUTBOUND_WEBHOOK_URL = process.env.OUTBOUND_WEBHOOK_URL || "";
-const SUPERADMIN_USERNAME = process.env.SUPERADMIN_USERNAME || "superadmin";
-const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || "";
-const SUPERADMIN_PASSWORD_HASH = process.env.SUPERADMIN_PASSWORD_HASH || "";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || "";
 const SESSION_SECRET = process.env.SESSION_SECRET || "change-this-session-secret";
 const BREVO_API_KEY = process.env.BREVO_API_KEY || "";
 const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || "";
@@ -54,7 +54,7 @@ const BREVO_SMTP_HOST = process.env.BREVO_SMTP_HOST || "smtp-relay.brevo.com";
 const BREVO_SMTP_PORT = Number(process.env.BREVO_SMTP_PORT || 587);
 const BREVO_SMTP_LOGIN = process.env.BREVO_SMTP_LOGIN || "";
 const BREVO_SMTP_KEY = process.env.BREVO_SMTP_KEY || "";
-const SESSION_COOKIE_NAME = "support_superadmin_session";
+const SESSION_COOKIE_NAME = "support_admin_session";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const productionConfigIssues = NODE_ENV === "production" ? getProductionConfigIssues(process.env) : [];
 
@@ -380,16 +380,16 @@ function emitTicketUpdated(ticket) {
   void sendWebhook("ticket.updated", ticket);
 }
 
-async function isValidSuperadminPassword(password) {
-  if (SUPERADMIN_PASSWORD_HASH) {
-    return bcrypt.compare(password, SUPERADMIN_PASSWORD_HASH);
+async function isValidAdminPassword(password) {
+  if (ADMIN_PASSWORD_HASH) {
+    return bcrypt.compare(password, ADMIN_PASSWORD_HASH);
   }
 
-  if (!SUPERADMIN_PASSWORD) {
+  if (!ADMIN_PASSWORD) {
     return false;
   }
 
-  return timingSafeEqual(password, SUPERADMIN_PASSWORD);
+  return timingSafeEqual(password, ADMIN_PASSWORD);
 }
 
 function requireApiKey(req, res, next) {
@@ -512,13 +512,13 @@ app.post("/login", loginLimiter, async (req, res) => {
   const normalizedUsername = String(username || "").trim().toLowerCase();
   let authenticatedAccount = null;
 
-  if (timingSafeEqual(normalizedUsername, SUPERADMIN_USERNAME)) {
-    const validPassword = await isValidSuperadminPassword(password);
+  if (timingSafeEqual(normalizedUsername, ADMIN_USERNAME)) {
+    const validPassword = await isValidAdminPassword(password);
 
     if (validPassword) {
       authenticatedAccount = {
         role: "admin",
-        username: SUPERADMIN_USERNAME,
+        username: ADMIN_USERNAME,
       };
     }
   }
@@ -583,7 +583,7 @@ app.post("/login", loginLimiter, async (req, res) => {
 
 app.post("/logout", requireAuthenticatedUser, async (req, res) => {
   await recordAuditLog("logout", {
-    actor: req.session.username || SUPERADMIN_USERNAME,
+    actor: req.session.username || ADMIN_USERNAME,
     actorIp: req.requestIp,
     targetType: "auth",
     details: { role: getSessionRole(req) },
@@ -619,10 +619,10 @@ app.get("/api/health", async (_req, res) => {
     outboundWebhookConfigured: Boolean(OUTBOUND_WEBHOOK_URL),
     brevoConfigured: Boolean(BREVO_SENDER_EMAIL && getBrevoEmailMode() !== "disabled"),
     brevoMode: getBrevoEmailMode(),
-    superadminConfigured:
-      SUPERADMIN_USERNAME !== "superadmin" ||
-      Boolean(SUPERADMIN_PASSWORD) ||
-      Boolean(SUPERADMIN_PASSWORD_HASH),
+    adminConfigured:
+      ADMIN_USERNAME !== "admin" ||
+      Boolean(ADMIN_PASSWORD) ||
+      Boolean(ADMIN_PASSWORD_HASH),
     productionConfigValid: productionConfigIssues.length === 0,
     productionConfigIssues,
   };
@@ -716,7 +716,7 @@ app.get("/profile", requireAuthenticatedUser, async (req, res) => {
   if (isAdmin(req)) {
     profile = {
       displayName: req.session.displayName || "Administrator",
-      username: req.session.username || SUPERADMIN_USERNAME,
+      username: req.session.username || ADMIN_USERNAME,
       email: req.session.email || "",
       role: "admin",
     };
@@ -766,7 +766,7 @@ app.post("/tickets", requireAuthenticatedUser, async (req, res) => {
   }
 
   const ticket = await createTicket(validation.value, {
-    actor: req.session.username || SUPERADMIN_USERNAME,
+    actor: req.session.username || ADMIN_USERNAME,
     actorIp: req.requestIp,
   });
 
@@ -808,7 +808,7 @@ app.post("/admin/employees", requireAdmin, async (req, res) => {
 
   try {
     const employee = await createOrUpdateEmployeeCredential(validation.value, passwordHash, {
-      actor: req.session.username || SUPERADMIN_USERNAME,
+      actor: req.session.username || ADMIN_USERNAME,
       actorIp: req.requestIp,
     });
 
@@ -847,7 +847,7 @@ app.post("/admin/employees", requireAdmin, async (req, res) => {
 
 app.post("/admin/employees/:id/delete", requireAdmin, async (req, res) => {
   const deletedEmployee = await deleteEmployeeCredential(req.params.id, {
-    actor: req.session.username || SUPERADMIN_USERNAME,
+    actor: req.session.username || ADMIN_USERNAME,
     actorIp: req.requestIp,
   });
 
@@ -874,7 +874,7 @@ app.post("/tickets/:id/status", requireAuthenticatedUser, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const updatedTicket = await updateTicketStatus(id, status, {
-    actor: req.session.username || SUPERADMIN_USERNAME,
+    actor: req.session.username || ADMIN_USERNAME,
     actorIp: req.requestIp,
   });
 
@@ -900,7 +900,7 @@ app.delete("/tickets/:id", requireAdmin, async (req, res) => {
   }
 
   const deletedTicket = await deleteTicket(id, {
-    actor: req.session.username || SUPERADMIN_USERNAME,
+    actor: req.session.username || ADMIN_USERNAME,
     actorIp: req.requestIp,
   });
 

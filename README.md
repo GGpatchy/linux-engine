@@ -2,7 +2,7 @@
 
 Standalone support ticket app with:
 
-- Superadmin login gate for the full web app
+- Admin login gate for the full web app
 - Protected dashboard at `/tickets`
 - Admin-only employee credential page at `/admin/employees`
 - PostgreSQL + Prisma ready data layer
@@ -32,9 +32,9 @@ DATABASE_SSL_MODE=disable
 DATABASE_SSL_REJECT_UNAUTHORIZED=false
 INBOUND_API_KEY=your-secret-key
 OUTBOUND_WEBHOOK_URL=
-SUPERADMIN_USERNAME=replace-with-a-non-default-admin-username
-SUPERADMIN_PASSWORD=replace-with-a-strong-password-at-least-12-characters
-SUPERADMIN_PASSWORD_HASH=
+ADMIN_USERNAME=replace-with-a-non-default-admin-username
+ADMIN_PASSWORD=replace-with-a-strong-password-at-least-12-characters
+ADMIN_PASSWORD_HASH=
 SESSION_SECRET=replace-with-a-long-random-session-secret
 BREVO_API_KEY=
 BREVO_SENDER_EMAIL=
@@ -52,9 +52,9 @@ PowerShell override if needed:
 ```powershell
 $env:INBOUND_API_KEY="replace-this-with-a-secret"
 $env:OUTBOUND_WEBHOOK_URL="https://your-crm-or-saas.example.com/webhooks/tickets"
-$env:SUPERADMIN_USERNAME="superadmin"
-$env:SUPERADMIN_PASSWORD="replace-this-with-a-strong-password"
-$env:SUPERADMIN_PASSWORD_HASH=""
+$env:ADMIN_USERNAME="replace-this-with-an-admin-username"
+$env:ADMIN_PASSWORD="replace-this-with-a-strong-password"
+$env:ADMIN_PASSWORD_HASH=""
 $env:SESSION_SECRET="replace-this-with-a-random-string"
 $env:DATABASE_URL="postgresql://postgres:postgres@localhost:5432/support_ticket_system?schema=public"
 $env:BREVO_API_KEY="xkeysib-..."
@@ -67,7 +67,7 @@ npm start
 
 Open:
 
-- `http://localhost:3002/login` to sign in as the superadmin
+- `http://localhost:3002/login` to sign in as an admin or employee
 - `http://localhost:3002/` to open the protected support dashboard after login
 
 ## Notes
@@ -77,7 +77,7 @@ Open:
 - When `DATABASE_URL` is set, tickets and audit logs use PostgreSQL via Prisma
 - PostgreSQL SSL is controlled explicitly with `DATABASE_SSL_MODE` instead of being forced by `NODE_ENV`
 - When `DATABASE_URL` is missing, the app falls back to `src/data/tickets.json` and `src/data/audit-log.json`
-- All web routes now require the configured superadmin login
+- All web routes now require the configured admin login
 - Sessions use PostgreSQL when `DATABASE_URL` is set, otherwise the in-memory fallback is used
 - CSRF protection is enabled for web form submissions and dashboard mutations
 - Login requests are rate-limited
@@ -96,8 +96,8 @@ Production boot now fails fast if any of these are missing or unsafe:
 - `DATABASE_URL`
 - `SESSION_SECRET` with a strong non-default value
 - `INBOUND_API_KEY` with a non-default value
-- `SUPERADMIN_USERNAME` changed from the default
-- `SUPERADMIN_PASSWORD` or `SUPERADMIN_PASSWORD_HASH`
+- `ADMIN_USERNAME` changed from the default
+- `ADMIN_PASSWORD` or `ADMIN_PASSWORD_HASH`
 
 Recommended deploy sequence:
 

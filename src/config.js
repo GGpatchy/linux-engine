@@ -4,6 +4,9 @@ function isNonEmptyString(value) {
 
 function getProductionConfigIssues(env) {
   const issues = [];
+  const adminUsername = env.ADMIN_USERNAME || "";
+  const adminPassword = env.ADMIN_PASSWORD || "";
+  const adminPasswordHash = env.ADMIN_PASSWORD_HASH || "";
 
   if (!isNonEmptyString(env.DATABASE_URL)) {
     issues.push("DATABASE_URL is required in production.");
@@ -17,19 +20,19 @@ function getProductionConfigIssues(env) {
     issues.push("INBOUND_API_KEY must be set to a non-default secret in production.");
   }
 
-  if (!isNonEmptyString(env.SUPERADMIN_USERNAME) || env.SUPERADMIN_USERNAME === "superadmin") {
-    issues.push("SUPERADMIN_USERNAME must be changed from the default value in production.");
+  if (!isNonEmptyString(adminUsername) || adminUsername === "admin") {
+    issues.push("ADMIN_USERNAME must be changed from the default value in production.");
   }
 
-  const hasPassword = isNonEmptyString(env.SUPERADMIN_PASSWORD);
-  const hasPasswordHash = isNonEmptyString(env.SUPERADMIN_PASSWORD_HASH);
+  const hasPassword = isNonEmptyString(adminPassword);
+  const hasPasswordHash = isNonEmptyString(adminPasswordHash);
 
   if (!hasPassword && !hasPasswordHash) {
-    issues.push("Set SUPERADMIN_PASSWORD or SUPERADMIN_PASSWORD_HASH in production.");
+    issues.push("Set ADMIN_PASSWORD or ADMIN_PASSWORD_HASH in production.");
   }
 
-  if (hasPassword && String(env.SUPERADMIN_PASSWORD).length < 12) {
-    issues.push("SUPERADMIN_PASSWORD must be at least 12 characters in production.");
+  if (hasPassword && String(adminPassword).length < 12) {
+    issues.push("ADMIN_PASSWORD must be at least 12 characters in production.");
   }
 
   return issues;
