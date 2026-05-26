@@ -1,0 +1,54 @@
+{
+  "auditLogs": [
+    {
+      "id": "e91efd3c-5688-49d4-9a35-73c439d6db4e",
+      "action": "ticket_status_updated",
+      "actor": "superadmin",
+      "actorIp": "::1",
+      "targetType": "ticket",
+      "targetId": "TKT-117399",
+      "details": {
+        "previousStatus": "new",
+        "nextStatus": "resolved"
+      },
+      "ticketId": null,
+      "createdAt": "2026-05-06T17:20:49.749Z"
+    },
+    {
+      "id": "4e25f7ba-599e-4ac2-a28d-2f0ca3057e18",
+      "action": "ticket_created",
+      "actor": "superadmin",
+      "actorIp": "::1",
+      "targetType": "ticket",
+      "targetId": "TKT-117399",
+      "details": {
+        "source": "portal",
+        "priority": "medium"
+      },
+      "ticketId": null,
+      "createdAt": "2026-05-06T17:20:49.498Z"
+    },
+    {
+      "id": "fb67a6ca-8e9e-4e5c-95da-1cacbd106f43",
+      "action": "login_success",
+      "actor": "superadmin",
+      "actorIp": "::1",
+      "targetType": "auth",
+      "targetId": null,
+      "details": null,
+      "ticketId": null,
+      "createdAt": "2026-05-06T17:20:49.326Z"
+    },
+    {
+      "id": "2f0dcf68-f7ac-4ae2-b55e-9337826988d8",
+      "action": "login_success",
+      "actor": "superadmin",
+      "actorIp": "::1",
+      "targetType": "auth",
+      "targetId": null,
+      "details": null,
+      "ticketId": null,
+      "createdAt": "2026-05-06T17:19:51.730Z"
+    }
+  ]
+}

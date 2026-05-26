@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TicketStatus {
+  new
+  in_progress
+  resolved
+}
+
+enum TicketPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum AuditAction {
+  login_success
+  login_failed
+  logout
+  ticket_created
+  ticket_status_updated
+  ticket_deleted
+  employee_credentials_provisioned
+  employee_deleted
+}
+
+model Ticket {
+  id         String         @id @default(cuid())
+  ticketCode String         @unique
+  name       String
+  email      String
+  subject    String
+  category   String
+  priority   TicketPriority @default(medium)
+  message    String
+  source     String         @default("portal")
+  externalId String?
+  metadata   Json?
+  status     TicketStatus   @default(new)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  deletedAt  DateTime?
+
+  auditLogs AuditLog[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([source, externalId])
+  @@index([deletedAt])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  action     AuditAction
+  actor      String?
+  actorIp    String?
+  targetType String
+  targetId   String?
+  details    Json?
+  createdAt  DateTime    @default(now())
+  ticketId   String?
+
+  ticket Ticket? @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  @@index([action, createdAt(sort: Desc)])
+  @@index([targetType, targetId])
+  @@index([ticketId])
+}
+
+model EmployeeCredential {
+  id                       String   @id @default(cuid())
+  name                     String
+  email                    String   @unique
+  username                 String   @unique
+  passwordHash             String
+  credentialDeliveryStatus String   @default("pending")
+  credentialDeliveryError  String?
+  lastCredentialSentAt     DateTime?
+  passwordUpdatedAt        DateTime @default(now())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}

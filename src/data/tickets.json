@@ -1,0 +1,111 @@
+{
+  "tickets": [
+    {
+      "id": "TKT-773808",
+      "name": "CRM Requester",
+      "email": "crm-ticket-6@local.invalid",
+      "subject": "test",
+      "category": "CRM Support",
+      "priority": "medium",
+      "message": "test",
+      "source": "leadvora-crm",
+      "externalId": "crm-ticket-6",
+      "metadata": {
+        "tenantId": 2,
+        "crmTicketId": 6,
+        "leadId": null,
+        "assignedUserId": null
+      },
+      "status": "new",
+      "createdAt": "2026-04-23T20:01:49.091Z"
+    },
+    {
+      "id": "TKT-482180",
+      "name": "CRM Requester",
+      "email": "crm-ticket-7@local.invalid",
+      "subject": "test",
+      "category": "CRM Support",
+      "priority": "high",
+      "message": "test",
+      "source": "leadvora-crm",
+      "externalId": "crm-ticket-7",
+      "metadata": {
+        "tenantId": 2,
+        "crmTicketId": 7,
+        "leadId": null,
+        "assignedUserId": null
+      },
+      "status": "new",
+      "createdAt": "2026-04-23T20:02:13.118Z"
+    },
+    {
+      "id": "TKT-804596",
+      "name": "CRM Requester",
+      "email": "crm-ticket-8@local.invalid",
+      "subject": "test",
+      "category": "CRM Support",
+      "priority": "low",
+      "message": "test",
+      "source": "leadvora-crm",
+      "externalId": "crm-ticket-8",
+      "metadata": {
+        "tenantId": 2,
+        "crmTicketId": 8,
+        "leadId": null,
+        "assignedUserId": null
+      },
+      "status": "resolved",
+      "createdAt": "2026-04-23T20:02:50.783Z",
+      "updatedAt": "2026-05-06T07:45:55.382Z"
+    },
+    {
+      "id": "TKT-257827",
+      "name": "CRM Requester",
+      "email": "crm-ticket-9@local.invalid",
+      "subject": "test001",
+      "category": "CRM Support",
+      "priority": "urgent",
+      "message": "test001",
+      "source": "leadvora-crm",
+      "externalId": "crm-ticket-9",
+      "metadata": {
+        "tenantId": 2,
+        "crmTicketId": 9,
+        "leadId": null,
+        "assignedUserId": null
+      },
+      "status": "resolved",
+      "createdAt": "2026-04-24T05:03:09.924Z",
+      "updatedAt": "2026-05-06T07:40:04.903Z"
+    },
+    {
+      "id": "TKT-623526",
+      "name": "Brevo Recheck",
+      "email": "support@trihub.tech",
+      "subject": "Brevo recheck status email test",
+      "category": "Technical",
+      "priority": "medium",
+      "message": "Rechecking Brevo status update flow from the support app.",
+      "source": "brevo-recheck",
+      "externalId": "brevo-recheck-1778054234",
+      "metadata": {},
+      "status": "new",
+      "createdAt": "2026-05-06T07:57:15.076Z"
+    },
+    {
+      "id": "TKT-117399",
+      "name": "Smoke Test",
+      "email": "smoke@example.com",
+      "subject": "Protected flow",
+      "category": "Technical",
+      "priority": "medium",
+      "message": "Checking csrf-protected ticket create.",
+      "source": "portal",
+      "externalId": null,
+      "metadata": {},
+      "status": "resolved",
+      "createdAt": "2026-05-06T17:20:49.496Z",
+      "updatedAt": "2026-05-06T17:20:49.746Z"
+    }
+  ]
+}

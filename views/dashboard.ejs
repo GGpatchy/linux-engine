@@ -1,0 +1,288 @@
+<%- include("partials/head", { pageTitle }) %>
+
+<main class="shell">
+  <%- include("partials/brand-bar") %>
+
+  <section class="dashboard-header">
+    <div>
+      <span class="eyebrow"><%= isAdmin ? "Admin View" : "Employee View" %></span>
+      <h1>Support Tickets</h1>
+    </div>
+
+    <div class="stats-card">
+      <span>Open tickets</span>
+      <strong id="openTicketCount"><%= openCount %></strong>
+      <div class="stack-actions">
+        <a class="button button-secondary" href="/raise-ticket">Raise ticket</a>
+        <a class="button button-secondary" href="/profile">Profile</a>
+        <form action="/logout" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="button button-ghost" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="notification-strip">
+    <div>
+      <strong>Live notifications</strong>
+    </div>
+    <button class="button" id="enableNotificationsButton" type="button">Enable Browser Alerts</button>
+  </section>
+
+  <section class="toast-stack" id="toastStack"></section>
+
+  <section class="ticket-section">
+    <div class="ticket-table-card ticket-table-card-queue">
+      <div class="table-toolbar table-toolbar-rich">
+        <div>
+          <h2>Ticket Queue</h2>
+        </div>
+        <span class="table-count" id="ticketCountLabel">
+          <%= tickets.filter((ticket) => ticket.status !== "resolved").length %> active
+        </span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="ticket-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Requester</th>
+              <th>Subject</th>
+              <th>Category</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ticketTableBody">
+            <% if (!tickets.filter((ticket) => ticket.status !== "resolved").length) { %>
+              <tr>
+                <td colspan="8" class="empty-state">No active tickets in the queue right now.</td>
+              </tr>
+            <% } %>
+
+            <% tickets.filter((ticket) => ticket.status !== "resolved").forEach(function(ticket) { %>
+              <tr data-ticket-id="<%= ticket.id %>">
+                <td><strong><%= ticket.id %></strong></td>
+                <td>
+                  <div><%= ticket.name %></div>
+                  <small><%= ticket.email %></small>
+                </td>
+                <td>
+                  <div><%= ticket.subject %></div>
+                  <small><%= ticket.message %></small>
+                </td>
+                <td><span class="badge badge-muted"><%= ticket.category %></span></td>
+                <td><span class="badge badge-priority-<%= ticket.priority %>"><%= ticket.priority %></span></td>
+                <td>
+                  <select class="status-select" data-ticket-id="<%= ticket.id %>" data-current-status="<%= ticket.status %>">
+                    <option value="new" <%= ticket.status === "new" ? "selected" : "" %>>New</option>
+                    <option value="in_progress" <%= ticket.status === "in_progress" ? "selected" : "" %>>In Progress</option>
+                    <option value="resolved" <%= ticket.status === "resolved" ? "selected" : "" %>>Resolved</option>
+                  </select>
+                </td>
+                <td><%= new Date(ticket.createdAt).toLocaleString() %></td>
+                <td>
+                  <button class="button button-inline view-details-button" type="button" data-ticket-id="<%= ticket.id %>">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ticket-table-card ticket-table-card-history">
+      <div class="table-toolbar table-toolbar-rich">
+        <div>
+          <h2>Recent Ticket History</h2>
+        </div>
+        <span class="table-count table-count-secondary" id="historyTicketCountLabel">
+          <%= tickets.filter((ticket) => ticket.status === "resolved").length %> resolved
+        </span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="ticket-table ticket-table-history">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Requester</th>
+              <th>Subject</th>
+              <th>Resolved</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ticketHistoryBody">
+            <% if (!tickets.filter((ticket) => ticket.status === "resolved").length) { %>
+              <tr>
+                <td colspan="5" class="empty-state">Resolved tickets will appear here after confirmation.</td>
+              </tr>
+            <% } %>
+
+            <% tickets.filter((ticket) => ticket.status === "resolved").forEach(function(ticket) { %>
+              <tr data-ticket-id="<%= ticket.id %>">
+                <td><strong><%= ticket.id %></strong></td>
+                <td>
+                  <div><%= ticket.name %></div>
+                  <small><%= ticket.email %></small>
+                </td>
+                <td>
+                  <div><%= ticket.subject %></div>
+                  <small><%= ticket.message %></small>
+                </td>
+                <td>
+                  <span class="badge badge-resolved">Resolved</span>
+                  <small><%= new Date(ticket.updatedAt || ticket.createdAt).toLocaleString() %></small>
+                </td>
+                <td>
+                  <button class="button button-inline view-details-button" type="button" data-ticket-id="<%= ticket.id %>">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <% if (isAdmin) { %>
+    <section class="notification-strip notification-strip-employees">
+      <div>
+        <strong>Employee credentials</strong>
+        <p>Create employee usernames and temporary passwords, then send access details directly to their email inbox.</p>
+      </div>
+      <a class="button" href="/admin/employees">Open Employee Access</a>
+    </section>
+  <% } %>
+</main>
+
+<section class="ticket-modal" id="ticketDetailsModal" aria-hidden="true">
+  <div class="ticket-modal-backdrop" data-close-modal="true"></div>
+  <div class="ticket-modal-card" role="dialog" aria-modal="true" aria-labelledby="ticketDetailsTitle">
+    <div class="ticket-modal-header">
+      <div>
+        <span class="eyebrow">Ticket Preview</span>
+        <h2 id="ticketDetailsTitle">Ticket Details</h2>
+      </div>
+      <button class="button button-ghost button-icon" type="button" id="closeTicketDetailsButton" aria-label="Close">
+        Close
+      </button>
+    </div>
+
+    <div class="ticket-modal-grid">
+      <div class="detail-card">
+        <span class="detail-label">Ticket ID</span>
+        <strong id="detailTicketId">-</strong>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Requester</span>
+        <strong id="detailName">-</strong>
+        <small id="detailEmail">-</small>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Subject</span>
+        <strong id="detailSubject">-</strong>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Created</span>
+        <strong id="detailCreatedAt">-</strong>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Category</span>
+        <strong id="detailCategory">-</strong>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Priority</span>
+        <strong id="detailPriority">-</strong>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Status</span>
+        <strong id="detailStatus">-</strong>
+      </div>
+      <div class="detail-card">
+        <span class="detail-label">Updated</span>
+        <strong id="detailUpdatedAt">-</strong>
+      </div>
+    </div>
+
+    <div class="detail-message-card">
+      <span class="detail-label">Message</span>
+      <p id="detailMessage">-</p>
+    </div>
+
+    <div class="detail-actions" id="detailActions" hidden>
+      <button
+        class="button button-danger"
+        type="button"
+        id="deleteTicketFromDetailsButton"
+        data-ticket-id=""
+        hidden
+      >
+        Delete Resolved Ticket
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="ticket-modal" id="resolveConfirmModal" aria-hidden="true">
+  <div class="ticket-modal-backdrop" data-close-resolve-modal="true"></div>
+  <div class="ticket-modal-card ticket-modal-card-compact" role="dialog" aria-modal="true" aria-labelledby="resolveConfirmTitle">
+    <div class="ticket-modal-header">
+      <div>
+        <span class="eyebrow">Resolve Ticket</span>
+        <h2 id="resolveConfirmTitle">Confirm resolution</h2>
+      </div>
+      <button class="button button-ghost button-icon" type="button" id="cancelResolveTopButton">Cancel</button>
+    </div>
+
+    <p class="resolve-copy" id="resolveConfirmCopy">
+      This ticket will be marked as resolved and moved to Recent Ticket History.
+    </p>
+
+    <div class="resolve-actions">
+      <button class="button button-ghost" type="button" id="cancelResolveButton">Keep in Queue</button>
+      <button class="button" type="button" id="confirmResolveButton">Confirm Resolve</button>
+    </div>
+  </div>
+</section>
+
+<section class="ticket-modal" id="deleteConfirmModal" aria-hidden="true">
+  <div class="ticket-modal-backdrop" data-close-delete-modal="true"></div>
+  <div class="ticket-modal-card ticket-modal-card-compact" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+    <div class="ticket-modal-header">
+      <div>
+        <span class="eyebrow">Delete Ticket</span>
+        <h2 id="deleteConfirmTitle">Confirm deletion</h2>
+      </div>
+      <button class="button button-ghost button-icon" type="button" id="cancelDeleteTopButton">Cancel</button>
+    </div>
+
+    <p class="resolve-copy" id="deleteConfirmCopy">
+      This resolved ticket will be permanently removed from Recent Ticket History.
+    </p>
+
+    <div class="resolve-actions">
+      <button class="button button-ghost" type="button" id="cancelDeleteButton">Keep Ticket</button>
+      <button class="button button-danger" type="button" id="confirmDeleteButton">Delete Ticket</button>
+    </div>
+  </div>
+</section>
+
+<script
+  id="dashboard-bootstrap"
+  type="application/json"
+  data-csrf-token="<%= csrfToken %>"
+  data-can-delete-tickets="<%= canDeleteTickets ? "true" : "false" %>"
+><%- JSON.stringify(tickets) %></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/dashboard.js"></script>
+
+<%- include("partials/footer") %>

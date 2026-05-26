@@ -1,0 +1,23 @@
+<%- include("partials/head", { pageTitle }) %>
+
+<main class="shell shell-center">
+  <%- include("partials/brand-bar") %>
+  <%- include("partials/page-utility-bar", { backHref: "/", backLabel: "Back", showProfileLink: true }) %>
+
+  <section class="auth-shell">
+    <div class="auth-card auth-card-form">
+      <span class="eyebrow">Access Restricted</span>
+      <h2>Permission required</h2>
+      <p><%= message %></p>
+      <div class="hero-actions">
+        <a class="button" href="/">Back to dashboard</a>
+        <form action="/logout" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="button button-ghost" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include("partials/footer") %>

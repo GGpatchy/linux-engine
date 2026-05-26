@@ -1,0 +1,62 @@
+<%- include("partials/head", { pageTitle }) %>
+
+<main class="shell">
+  <%- include("partials/brand-bar") %>
+  <%- include("partials/page-utility-bar", { backHref: "/", backLabel: "Back", showProfileLink: false }) %>
+
+  <section class="profile-layout">
+    <div class="form-card">
+      <span class="eyebrow"><%= profile.role === "admin" ? "Admin Profile" : "Employee Profile" %></span>
+      <h1>Profile</h1>
+      <p>Review the account details currently tied to your session.</p>
+
+      <div class="profile-grid">
+        <div class="detail-card">
+          <span class="detail-label">Display Name</span>
+          <strong><%= profile.displayName || "-" %></strong>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">Role</span>
+          <strong><%= profile.role === "admin" ? "Administrator" : "Employee" %></strong>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">Username</span>
+          <strong><%= profile.username || "-" %></strong>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">Email</span>
+          <strong><%= profile.email || "Not available" %></strong>
+        </div>
+
+        <% if (profile.role === "employee") { %>
+          <div class="detail-card">
+            <span class="detail-label">Credential Delivery</span>
+            <strong><%= profile.deliveryStatus || "-" %></strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Password Updated</span>
+            <strong><%= profile.passwordUpdatedAt ? new Date(profile.passwordUpdatedAt).toLocaleString() : "-" %></strong>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="stats-card profile-actions-card">
+      <span>Quick actions</span>
+      <strong><%= profile.role === "admin" ? "Admin" : "User" %></strong>
+      <div class="stack-actions">
+        <a class="button button-secondary" href="/">Open dashboard</a>
+        <a class="button button-secondary" href="/raise-ticket">Raise ticket</a>
+        <% if (isAdmin) { %>
+          <a class="button button-secondary" href="/admin/employees">Create employees</a>
+        <% } %>
+        <form action="/logout" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="button button-ghost" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include("partials/footer") %>

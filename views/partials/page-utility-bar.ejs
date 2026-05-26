@@ -1,0 +1,16 @@
+<section class="page-utility-bar">
+  <a class="button button-secondary page-back-button" href="<%= backHref || '/' %>">
+    <span class="button-icon-symbol" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+    </span>
+    <span><%= backLabel || "Back" %></span>
+  </a>
+
+  <div class="page-utility-actions">
+    <% if (typeof showProfileLink === "undefined" || showProfileLink) { %>
+      <a class="button button-ghost" href="/profile">Profile</a>
+    <% } %>
+  </div>
+</section>

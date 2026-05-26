@@ -1,0 +1,39 @@
+{
+  "name": "support-ticket-system",
+  "version": "1.0.0",
+  "description": "Standalone support ticket system with real-time notifications.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
+  },
+  "keywords": [
+    "support",
+    "tickets",
+    "notifications"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "connect-pg-simple": "^10.0.0",
+    "csurf": "^1.11.0",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.1",
+    "express-session": "^1.19.0",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "prisma": "^7.8.0",
+    "socket.io": "^4.8.1"
+  }
+}

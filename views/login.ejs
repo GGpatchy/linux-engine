@@ -1,0 +1,53 @@
+<%- include("partials/head", { pageTitle }) %>
+
+<main class="shell shell-center">
+  <%- include("partials/brand-bar") %>
+  <%- include("partials/page-utility-bar", { backHref: "/", backLabel: "Back", showProfileLink: false }) %>
+
+  <section class="auth-shell">
+    <div class="auth-card auth-card-form">
+      <h2>Sign in</h2>
+
+      <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form action="/login" method="post" class="ticket-form" autocomplete="off">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="hidden" name="next" value="<%= nextPath %>" />
+
+        <label>
+          Username
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+        </label>
+
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+            autocomplete="new-password"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+        </label>
+
+        <button class="button" type="submit">Login</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<%- include("partials/footer") %>

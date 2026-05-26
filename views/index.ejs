@@ -1,0 +1,94 @@
+<%- include("partials/head", { pageTitle }) %>
+
+<main class="shell shell-center">
+  <%- include("partials/brand-bar") %>
+  <%- include("partials/page-utility-bar", { backHref: "/", backLabel: "Back", showProfileLink: true }) %>
+
+  <section class="hero-card">
+    <div class="hero-copy">
+      <span class="eyebrow">Triverse Solutions Portal</span>
+      <h1>Raise a ticket and keep your team instantly informed.</h1>
+      <p>
+        This Triverse-branded support system stores every ticket locally and can later be
+        wired into your CRM, WhatsApp, or any back-office workflow.
+      </p>
+      <div class="hero-actions hero-actions-grid">
+        <a class="button button-secondary" href="/">Open dashboard</a>
+        <% if (isAdmin) { %>
+          <a class="button button-secondary" href="/admin/employees">Create employees</a>
+        <% } %>
+        <form action="/logout" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="button button-ghost" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>New Ticket</h2>
+
+      <% if (success) { %>
+        <div class="alert alert-success"><%= success %></div>
+      <% } %>
+
+      <% if (typeof error !== "undefined" && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form action="/tickets" method="post" class="ticket-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label>
+          Name
+          <input type="text" name="name" placeholder="Full name" required />
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" placeholder="name@example.com" required />
+        </label>
+
+        <label>
+          Subject
+          <input type="text" name="subject" placeholder="Issue summary" required />
+        </label>
+
+        <div class="field-row">
+          <label>
+            Category
+            <select name="category">
+              <option>General</option>
+              <option>Admissions</option>
+              <option>Payments</option>
+              <option>Technical</option>
+              <option>Follow-up</option>
+            </select>
+          </label>
+
+          <label>
+            Priority
+            <select name="priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Message
+          <textarea
+            name="message"
+            rows="5"
+            placeholder="Describe the issue so the support team can help quickly."
+            required
+          ></textarea>
+        </label>
+
+        <button class="button" type="submit">Submit Ticket</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<%- include("partials/footer") %>
