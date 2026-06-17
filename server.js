@@ -668,6 +668,53 @@ app.post("/api/inbound/tickets", requireApiKey, async (req, res) => {
   });
 });
 
+app.post("/api/tickets", requireApiKey, async (req, res) => {
+  try {
+    const { subject, requester, priority } = req.body;
+
+    if (!subject || !requester || !priority) {
+      return res.status(400).json({
+        error: "Missing required fields: subject, requester, priority",
+      });
+    }
+
+    const ticket = await prisma.ticket.create({
+      data: {
+        subject,
+        requester,
+        priority,
+        status: "OPEN",
+      },
+    });
+
+    emitTicketCreated(ticket);
+
+    // Call outbound webhook if configured
+    if (OUTBOUND_WEBHOOK_URL) {
+      try {
+        await fetch(OUTBOUND_WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": INBOUND_API_KEY,
+          },
+          body: JSON.stringify({
+            event: "ticket.created",
+            ticket,
+          }),
+        });
+      } catch (webhookErr) {
+        console.error("Outbound webhook failed:", webhookErr.message);
+      }
+    }
+
+    res.status(201).json({ success: true, ticket });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create ticket" });
+  }
+});
+
 app.get("/", requireAuthenticatedUser, async (req, res) => {
   res.render("dashboard", {
     pageTitle: "Support Tickets Dashboard",
