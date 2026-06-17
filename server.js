@@ -5,6 +5,7 @@ const path = require("path");
 require("./src/loadEnv");
 
 const bcrypt = require("bcryptjs");
+const csrf = require("csurf");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
 const session = require("express-session");
@@ -93,6 +94,15 @@ const sessionMiddleware = session({
 });
 
 app.use(sessionMiddleware);
+
+const csrfProtection = csrf();
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next(); // 🚀 skip CSRF for API
+  }
+  return csrfProtection(req, res, next);
+});
 
 function timingSafeEqual(left, right) {
   const leftBuffer = Buffer.from(String(left));
