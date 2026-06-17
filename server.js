@@ -97,12 +97,9 @@ app.use(sessionMiddleware);
 
 const csrfProtection = csrf();
 
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api')) {
-    return next(); // 🚀 skip CSRF for API
-  }
-  return csrfProtection(req, res, next);
-});
+app.use('/api', (req, res, next) => next()); // 🚀 skip CSRF
+
+app.use(csrfProtection);
 
 function timingSafeEqual(left, right) {
   const leftBuffer = Buffer.from(String(left));
